@@ -1,25 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
+import React,{useEffect} from 'react';
 import './App.css';
+import Login from './components/Login/Login';
+import PersistentDrawerLeft from './components/Menu/PersistentDrawerLeft';
+import app_reducer from './reducers/app';
+import initialState from './compState/authState';
+import LS from './Services/LoginService';
+export const AuthContext = React.createContext();
 
 function App() {
+  const [state, authDispatch] = React.useReducer(app_reducer, initialState);
+
+  useEffect(()=>{     
+    LS.isValidateToken(authDispatch);    
+  },[]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthContext.Provider value={{state,authDispatch}}>      
+      <>
+        {!state.isAuthenticated ? <Login /> : <PersistentDrawerLeft />}
+      </>
+    </AuthContext.Provider>
   );
 }
 
